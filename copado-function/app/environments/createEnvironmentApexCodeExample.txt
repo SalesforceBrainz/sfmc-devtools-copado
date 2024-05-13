@@ -1,0 +1,7 @@
+copado.CreateExecution.Request request = new copado.CreateExecution.Request();
+request.parentId = '[functionId]'; 
+request.templateName = '[jobTemplateApiName]';
+request.callback = '[callBackClassName]';
+request.dataJson = '[{"Name":"ENVIRONMENT_NAME","environmentVariables":[{"name":"ENVIRONMENT_VARIABLE_NAME","value":"ENVIRONMENT_VARIABLE_VALUE"}],"properties":[{"name":"PROPERTY_NAME","apiName":"PROPERTY_API_NAME","value":"PROPERTY_VALUE","hideValue":TRUE_OR_FALSE}]}]';
+request.runAfterInstantiation = true;
+copado.CreateExecution.execute(new List<copado.CreateExecution.Request>{ request });

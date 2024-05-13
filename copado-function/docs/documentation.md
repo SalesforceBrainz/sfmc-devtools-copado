@@ -4,6 +4,9 @@
 <dt><a href="#Deploy">Deploy</a></dt>
 <dd><p>handles downloading metadata</p>
 </dd>
+<dt><a href="#Init">Init</a></dt>
+<dd><p>Class for Init function</p>
+</dd>
 <dt><a href="#Retrieve">Retrieve</a></dt>
 <dd><p>handles downloading metadata</p>
 </dd>
@@ -224,6 +227,23 @@ applies market values of target onto name and key of commitSelectionArr
 | --- | --- | --- |
 | commitSelectionArr | <code>Array.&lt;TYPE.CommitSelection&gt;</code> | list of items to be added |
 
+<a name="Init"></a>
+
+## Init
+Class for Init function
+
+**Kind**: global class  
+<a name="Init.mcdevInit"></a>
+
+### Init.mcdevInit(credentials, credentialName, options)
+**Kind**: static method of [<code>Init</code>](#Init)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| credentials | <code>object</code> | the credentials for the salesforce marketing cloud |
+| credentialName | <code>string</code> | the credential name |
+| options | <code>object</code> | contains the url, the downloadBUs and the gitPush values |
+
 <a name="Retrieve"></a>
 
 ## Retrieve
@@ -315,7 +335,6 @@ methods to handle interaction with the copado platform
 **Kind**: global class  
 
 * [Copado](#Copado)
-    * [.mcdevInit(credentials, credentialName, url)](#Copado.mcdevInit)
     * [.attachJson(localPath, [parentSfid], [async], [preMsg])](#Copado.attachJson) ⇒ <code>void</code>
     * [.attachLog(localPath)](#Copado.attachLog) ⇒ <code>Promise.&lt;void&gt;</code>
     * [._downloadFile(fileSFID, [preMsg])](#Copado._downloadFile) ⇒ <code>void</code>
@@ -323,17 +342,6 @@ methods to handle interaction with the copado platform
     * [.checkoutSrc(workingBranch, [createBranch])](#Copado.checkoutSrc) ⇒ <code>void</code>
     * [.deleteBranch(featureBranch)](#Copado.deleteBranch) ⇒ <code>void</code>
     * [.uploadToolLogs()](#Copado.uploadToolLogs) ⇒ <code>Promise.&lt;void&gt;</code>
-
-<a name="Copado.mcdevInit"></a>
-
-### Copado.mcdevInit(credentials, credentialName, url)
-**Kind**: static method of [<code>Copado</code>](#Copado)  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| credentials | <code>object</code> | the credentials for the salesforce marketing cloud |
-| credentialName | <code>string</code> | the credential name |
-| url | <code>string</code> | the git remote URL |
 
 <a name="Copado.attachJson"></a>
 

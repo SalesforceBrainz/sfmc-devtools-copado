@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /*
- * mcdev-copado v1.3.0 (built 2022-12-05T15:06:59.839Z)
+ * mcdev-copado v1.3.0 (built 2022-12-05T16:05:54.175Z)
  * Function: Commit.fn.js
  * Dependenies: mcdev@>=4.1.12, Copado Deployer@20.1
  * Homepage: https://github.com/Accenture/sfmc-devtools-copado#readme
@@ -151,11 +151,11 @@ var require_Util = __commonJS({
             "Completed installing Accenture SFMC DevTools"
           );
           return;
-        } else if (CONFIG2.mcdevVersion.charAt(0) === "#") {
-          installer = `accenture/sfmc-devtools${CONFIG2.mcdevVersion}`;
         } else if (!CONFIG2.mcdevVersion) {
           Log2.error("Please specify mcdev_version in pipeline & environment settings");
           throw new Error("Please specify mcdev_version in pipeline & environment settings");
+        } else if (CONFIG2.mcdevVersion.charAt(0) === "#") {
+          installer = `accenture/sfmc-devtools${CONFIG2.mcdevVersion}`;
         } else {
           installer = `mcdev@${CONFIG2.mcdevVersion}`;
         }
@@ -251,15 +251,6 @@ var require_Copado = __commonJS({
     var Log2 = require_Log();
     var Util2 = require_Util();
     var Copado2 = class {
-      static mcdevInit(credentials, credentialName, url) {
-        Util2.execCommand(
-          `Initializing mcdev: ${credentialName}, ${credentials[credentialName].client_id}", "${credentials[credentialName].client_secret}", "${credentials[credentialName].auth_url}", "${url}", ${credentials[credentialName].account_id}`,
-          [
-            `mcdev init --y.credentialName "${credentialName}" --y.client_id "${credentials[credentialName].client_id}" --y.client_secret "${credentials[credentialName].client_secret}" --y.auth_url "${credentials[credentialName].auth_url}" --y.gitRemoteUrl "${url}" --y.account_id ${credentials[credentialName].account_id} --y.downloadBUs "false" --y.gitPush "true"`
-          ],
-          "Mcdev initialized!"
-        );
-      }
       static attachJson(localPath, parentSfid, async = false, preMsg) {
         Copado2._attachFile(localPath, async, parentSfid, preMsg);
       }
@@ -484,6 +475,7 @@ async function run() {
     Util.execCommand(null, "npm --version", null);
     Util.execCommand(null, "node --version", null);
     Util.execCommand(null, "git version", null);
+    Util.execCommand(null, "mcdev --version", null);
   }
   Log.debug(`Change Working directory to: ${CONFIG.tmpDirectory}`);
   try {

@@ -98,6 +98,7 @@ async function run() {
         Util.execCommand(null, 'npm --version', null);
         Util.execCommand(null, 'node --version', null);
         Util.execCommand(null, 'git version', null);
+        Util.execCommand(null, 'mcdev --version', null);
     }
 
     Log.debug(`Change Working directory to: ${CONFIG.tmpDirectory}`);

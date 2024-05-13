@@ -2,25 +2,35 @@
 'use strict';
 
 const resolve = require('node:path').resolve;
+const fs = require('node:fs');
 const CONFIG = require('./common/Config');
 const Log = require('./common/Log');
 const Util = require('./common/Util');
 const Copado = require('./common/Copado');
 
+// ++++ CONFIG ++++
+CONFIG.mcdevCopadoVersion = '[VI]{{inject}}[/VI]';
 // credentials
-CONFIG.credentialNameSource = process.env.credentialNameSource;
+CONFIG.credentialNameSource = process.env.credentialName;
 CONFIG.credentialNameTarget = null;
-CONFIG.credentials = process.env.credentials;
+CONFIG.client_id = process.env.client_id;
+CONFIG.client_secret = process.env.client_secret;
+CONFIG.auth_url = process.env.auth_url;
+CONFIG.account_id = process.env.enterprise_id;
+CONFIG.credentials = `{"${CONFIG.credentialNameSource}":{"client_id":"${CONFIG.client_id}","client_secret":"${CONFIG.client_secret}","auth_url":"${CONFIG.auth_url}","account_id":"${CONFIG.account_id}"}}`;
+
 // generic
 CONFIG.configFilePath = null;
-CONFIG.repoUrl = process.env.repoUrl;
 CONFIG.debug = process.env.debug === 'true' ? true : false;
-CONFIG.installMcdevLocally = process.env.installMcdevLocally === 'true' ? true : false;
+CONFIG.installMcdevLocally = null;
 CONFIG.mainBranch = null;
 CONFIG.mcdevVersion = null;
 CONFIG.metadataFilePath = null; // do not change - LWC depends on it! // not needed in this case, previous value: 'mcmetadata.json'
 CONFIG.source_mid = null;
 CONFIG.tmpDirectory = '../tmp';
+CONFIG.userEmail = process.env.git_email;
+CONFIG.userName = process.env.git_name;
+
 // retrieve
 CONFIG.source_sfid = null;
 // commit
@@ -44,6 +54,10 @@ CONFIG.merge_strategy = null; // set default merge strategy
 CONFIG.promotionBranch = null; // The promotion branch of a PR
 CONFIG.promotionName = null; // The promotion name of a PR
 CONFIG.target_mid = null;
+// init
+CONFIG.repoUrl = process.env.repoUrl;
+CONFIG.downloadBUs = process.env.downloadBUs === 'false' ? false : true;
+CONFIG.gitPush = process.env.gitPush === 'false' ? false : true;
 
 /**
  * main method that combines runs this function
@@ -55,14 +69,23 @@ async function run() {
     Log.debug('');
     Log.debug('Parameters');
     Log.debug('===================');
+    // if one of the elements present in the array are undefined, this error will be triggered
+    if ([CONFIG.client_id, CONFIG.client_secret, CONFIG.auth_url, CONFIG.account_id].includes()) {
+        Log.error(
+            `Could not find credentials: ${CONFIG.client_id}, ${CONFIG.client_secret}, ${CONFIG.auth_url}, ${CONFIG.account_id}`
+        );
+        throw new Error(
+            `Could not find credentials: ${CONFIG.client_id}, ${CONFIG.client_secret}, ${CONFIG.auth_url}, ${CONFIG.account_id}`
+        );
+    }
     try {
         CONFIG.credentials = JSON.parse(CONFIG.credentials);
     } catch (ex) {
-        Log.error('Could not parse credentials');
+        Log.error(`Could not parse credentials: ${CONFIG.credentials}`);
         throw ex;
     }
-    Log.debug(CONFIG);
 
+    Log.debug(CONFIG);
     // ensure we got SFMC credentials for our source BU
     if (!CONFIG.credentials[CONFIG.credentialNameSource]) {
         Log.error(`No credentials found for source (${CONFIG.credentialNameSource})`);
@@ -76,34 +99,52 @@ async function run() {
         Util.execCommand(null, 'npm --version', null);
         Util.execCommand(null, 'node --version', null);
         Util.execCommand(null, 'git version', null);
+        Util.execCommand(null, 'mcdev --version', null);
     }
 
     Log.debug(`Change Working directory to: ${CONFIG.tmpDirectory}`);
     // prevent git errors down the road
     try {
-        Util.execCommand(null, ['git config --global --add safe.directory /tmp']);
+        Util.execCommand(null, [
+            'git config --global --add safe.directory ' + resolve(CONFIG.tmpDirectory),
+        ]);
     } catch {
-        try {
-            Util.execCommand(null, [
-                'git config --global --add safe.directory ' + resolve(CONFIG.tmpDirectory),
-            ]);
-        } catch {
-            Log.error('Could not set tmp directoy as safe directory');
-        }
+        Log.error('Could not set tmp directoy as safe directory');
     }
+
     // actually change working directory
+    if (!fs.existsSync(CONFIG.tmpDirectory)) {
+        fs.mkdirSync(CONFIG.tmpDirectory);
+    }
     process.chdir(CONFIG.tmpDirectory);
     Log.debug(process.cwd());
 
     try {
         Log.info('');
-        Log.info('Preparing');
+        Log.info('Adding git email and name');
         Log.info('===================');
         Log.info('');
-        Util.provideMCDevTools();
-        Copado.mcdevInit(CONFIG.credentials, CONFIG.credentialNameSource, CONFIG.repoUrl);
+        Util.execCommand(null, [
+            `git config --global user.email "${CONFIG.userEmail}"`,
+            `git config --global user.name "${CONFIG.userName}"`,
+        ]);
     } catch (ex) {
-        Log.error('initializing failed: ' + ex.message);
+        Log.error('adding git email and name failed: ' + ex.message);
+        throw ex;
+    }
+
+    try {
+        Log.info('');
+        Log.info('Initializing mcdev tools');
+        Log.info('===================');
+        Log.info('');
+        Init.mcdevInit(CONFIG.credentials, CONFIG.credentialNameSource, {
+            url: CONFIG.repoUrl,
+            downloadBUs: CONFIG.downloadBUs,
+            gitPush: CONFIG.gitPush,
+        });
+    } catch (ex) {
+        Log.error('Initializing failed: ' + ex.message);
         throw ex;
     }
 
@@ -113,6 +154,27 @@ async function run() {
     Log.info('McdevInit.js done');
 
     Copado.uploadToolLogs();
+}
+
+/**
+ * Class for Init function
+ */
+class Init {
+    /**
+     *
+     * @param {object} credentials the credentials for the salesforce marketing cloud
+     * @param {string} credentialName the credential name
+     * @param {object} options contains the url, the downloadBUs and the gitPush values
+     */
+    static mcdevInit(credentials, credentialName, options) {
+        Util.execCommand(
+            `Initializing mcdev`,
+            [
+                `mcdev init --y.credentialName "${credentialName}" --y.client_id "${credentials[credentialName].client_id}" --y.client_secret "${credentials[credentialName].client_secret}" --y.auth_url "${credentials[credentialName].auth_url}" --y.gitRemoteUrl "${options.url}" --y.account_id ${credentials[credentialName].account_id} --y.downloadBUs "${options.downloadBUs}" --y.gitPush "${options.gitPush}"`,
+            ],
+            'Mcdev initialized!'
+        );
+    }
 }
 
 run(); // eslint-disable-line unicorn/prefer-top-level-await

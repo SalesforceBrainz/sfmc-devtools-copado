@@ -9,7 +9,7 @@
     },
     {
       "type": "node-terminal",
-      "name": "debug: dist/init",
+      "name": "init (dist/)",
       "request": "launch",
       "command": "node Init.fn.js --preserve-symlinks",
       "cwd": "${workspaceFolder}/copado-function/dist",
@@ -18,7 +18,7 @@
     },
     {
       "type": "node-terminal",
-      "name": "debug: dist/retrieve",
+      "name": "retrieve (dist/)",
       "request": "launch",
       "command": "node Retrieve.fn.js --preserve-symlinks",
       "cwd": "${workspaceFolder}/copado-function/dist",
@@ -27,7 +27,7 @@
     },
     {
       "type": "node-terminal",
-      "name": "debug: dist/commit",
+      "name": "commit (dist/)",
       "request": "launch",
       "command": "node Commit.fn.js --preserve-symlinks",
       "cwd": "${workspaceFolder}/copado-function/dist",
@@ -36,20 +36,11 @@
     },
     {
       "type": "node-terminal",
-      "name": "debug: dist/deploy",
+      "name": "deploy (dist/)",
       "request": "launch",
       "command": "node Deploy.fn.js --preserve-symlinks",
       "cwd": "${workspaceFolder}/copado-function/dist",
       "envFile": "${workspaceFolder}/copado-function/app/environments/Deploy.env",
-      "preLaunchTask": "esbuild"
-    },
-    {
-      "type": "node-terminal",
-      "name": "debug: dist/upgrade",
-      "request": "launch",
-      "command": "node Upgrade.fn.js --preserve-symlinks",
-      "cwd": "${workspaceFolder}/copado-function/dist",
-      "envFile": "${workspaceFolder}/copado-function/app/environments/Upgrade.env",
       "preLaunchTask": "esbuild"
     }
   ]

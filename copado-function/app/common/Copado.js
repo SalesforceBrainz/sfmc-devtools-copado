@@ -11,22 +11,6 @@ const Util = require('./Util');
  */
 class Copado {
     /**
-     *
-     * @param {object} credentials the credentials for the salesforce marketing cloud
-     * @param {string }credentialName the credential name
-     * @param {string} url the git remote URL
-     */
-    static mcdevInit(credentials, credentialName, url) {
-        Util.execCommand(
-            `Initializing mcdev: ${credentialName}, ${credentials[credentialName].client_id}", "${credentials[credentialName].client_secret}", "${credentials[credentialName].auth_url}", "${url}", ${credentials[credentialName].account_id}`,
-            [
-                `mcdev init --y.credentialName "${credentialName}" --y.client_id "${credentials[credentialName].client_id}" --y.client_secret "${credentials[credentialName].client_secret}" --y.auth_url "${credentials[credentialName].auth_url}" --y.gitRemoteUrl "${url}" --y.account_id ${credentials[credentialName].account_id} --y.downloadBUs "false" --y.gitPush "true"`,
-            ],
-            'Mcdev initialized!'
-        );
-    }
-
-    /**
      * Finally, attach the resulting metadata JSON to the source environment
      *
      * @param {string} localPath where we stored the temporary json file

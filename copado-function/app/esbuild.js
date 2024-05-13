@@ -42,7 +42,7 @@ const isWatch = args.includes('--watch');
                         '*/\n\n',
                 },
                 platform: 'node',
-                external: ['../tmp/*'],
+                external: ['../tmp/*', '../../node_modules/*'],
                 preserveSymlinks: true,
                 outdir: '../dist',
                 absWorkingDir: absWorkingDir,

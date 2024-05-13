@@ -127,13 +127,13 @@ class Util {
                 'Completed installing Accenture SFMC DevTools'
             );
             return; // we're done here
+        } else if (!CONFIG.mcdevVersion) {
+            Log.error('Please specify mcdev_version in pipeline & environment settings');
+            throw new Error('Please specify mcdev_version in pipeline & environment settings');
         } else if (CONFIG.mcdevVersion.charAt(0) === '#') {
             // assume branch of mcdev's git repo shall be loaded
 
             installer = `accenture/sfmc-devtools${CONFIG.mcdevVersion}`;
-        } else if (!CONFIG.mcdevVersion) {
-            Log.error('Please specify mcdev_version in pipeline & environment settings');
-            throw new Error('Please specify mcdev_version in pipeline & environment settings');
         } else {
             // default, install via npm at specified version
             installer = `mcdev@${CONFIG.mcdevVersion}`;
